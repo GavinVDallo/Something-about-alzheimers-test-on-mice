@@ -1,0 +1,48 @@
+---
+title: "No upload stat test"
+output: html_document
+date: "2026-05-10"
+---
+
+```{r setup, include=FALSE}
+# This chunk loads the data but won't show up in your final report
+# Ensure your CSV is in the same folder as this RMD file
+data <- read.csv(file.choose("Alzheimers Mice Data.csv"))
+
+# Crucial step: Convert to factors so R treats them as groups, not numbers
+data$AD_Status <- as.factor(data$AD_Status)
+data$Treatment <- as.factor(data$Treatment)
+```
+
+## Training Day Analysis
+We examine if drug treatment or Alzheimer's status affected initial learning.
+
+```{r training-anova}
+train_model <- aov(Training ~ AD_Status * Treatment, data = data)
+summary(train_model)
+```
+
+## Memory Day Analysis
+We examine the effects on memory retention (the main goal of the study).
+
+```{r memory-anova}
+memory_model <- aov(Memory ~ AD_Status * Treatment, data = data)
+summary(memory_model)
+```
+
+## Visualizing Interactions
+If the interaction term (AD_Status:Treatment) is significant, this plot helps show which drug helped which group.
+
+```{r interaction-plot}
+interaction.plot(x.factor = data$Treatment, 
+                 trace.factor = data$AD_Status, 
+                 response = data$Memory,
+                 type = "b", # 'b' for both lines and points
+                 pch = 19, 
+                 col = c("red", "blue"),
+                 xlab = "Drug Treatment",
+                 ylab = "Mean Memory Errors",
+                 trace.label = "AD Status")
+```
+
+
